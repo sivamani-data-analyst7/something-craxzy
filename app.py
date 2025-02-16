@@ -54,11 +54,11 @@ if file is not None:
         fig_line.update_yaxes(range=[y_min, y_max])  # Set custom y-axis range
         st.plotly_chart(fig_line)
 
-        # 📊 Bar Chart: Processed vs. Target Lots
+  # 📊 Bar Chart: Processed vs. Target Lots
         st.subheader("Processed vs. Target Lots")
         fig_bar = px.bar(filtered_data, x='Date', y=['Processed Lots', 'Target Lots'], 
                          title='Processed vs. Target Lots', barmode='group')
-        fig_bar.update_yaxes(range=[y_min, y_max])  # Ensure same scaling for consistency
+        fig_bar.update_xaxes(type='category')  # Ensure x-axis is categorical (no time)
         st.plotly_chart(fig_bar)
 
         # 📊 Pie Chart: Target Achievement Distribution
