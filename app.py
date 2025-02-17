@@ -4,6 +4,7 @@ import plotly.express as px
 
 # Streamlit app layout
 st.title('Agent Productivity Tracker')
+st.subheader("Created by Sivamani Koppisetti")
 
 # File upload widget
 file = st.file_uploader("Upload your CSV file", type="csv")
@@ -47,7 +48,7 @@ if file is not None:
             st.warning('Target Not Achieved for some dates in the range')
 
         # 📊 Line Chart: Processed Lots Over Time (Enhanced Visualization)
-        st.subheader("Processed Lots Over Time")
+        st.subheader("Processed Lots Over Date")
         fig_line = px.line(filtered_data, x='Date', y='Processed Lots', title='Processed Lots Trend')
 
         # Expand y-axis range for better visibility of small changes
@@ -57,7 +58,7 @@ if file is not None:
         fig_line.update_yaxes(range=[y_min, y_max])  # Set custom y-axis range
         st.plotly_chart(fig_line)
 
-        # 📊 Bar Chart: Processed vs. Target Lots
+        # 📊 Bar Chart: Processed Lots vs. Target Lots
         st.subheader("Processed vs. Target Lots")
         fig_bar = px.bar(filtered_data, x='Date', y=['Processed Lots', 'Target Lots'], 
                          title='Processed vs. Target Lots', barmode='group')
