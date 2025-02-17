@@ -13,7 +13,7 @@ if file is not None:
     my_data = pd.read_csv(file, encoding='ISO-8859-1')
 
     # Convert 'Date' column to datetime and keep only the date (no time)
-    my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y').dt.date
+    my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y',errors='coerce').dt.date
 
     # Input fields for Agent name
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
