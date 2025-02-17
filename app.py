@@ -27,7 +27,7 @@ if file is not None:
         end_date = st.date_input('To Date', min_value=start_date, max_value=my_data['Date'].max())
 
     # Filter the data based on inputs
-    filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
+    filtered_data = my_data[(my_data['Agent Name'] == agent_name) & 
                             (my_data['Date'] >= start_date) & 
                             (my_data['Date'] <= end_date)]
 
