@@ -12,8 +12,17 @@ if file is not None:
     # Read the CSV file
     my_data = pd.read_csv(file, encoding='ISO-8859-1')
 
-    # Convert 'Date' column to datetime and keep only the date (no time)
-    my_data['Date'] = pd.to_datetime(my_data['Date'], infer_datetime_format=True).dt.date
+    # Inspect the unique values in the 'Date' column (for debugging)
+    st.write(my_data['Date'].unique())
+
+    # Convert 'Date' column to datetime, handling errors and filling invalid dates with NaT
+    my_data['Date'] = pd.to_datetime(my_data['Date'], infer_datetime_format=True, errors='coerce')
+
+    # Optionally, fill NaT (invalid date entries) with a placeholder date if needed
+    my_data['Date'].fillna(pd.to_datetime('01/01/2025'), inplace=True)
+
+    # Convert the datetime object to just the date (no time)
+    my_data['Date'] = my_data['Date'].dt.date
 
     # Input fields for Agent name and date range
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
