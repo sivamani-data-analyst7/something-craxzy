@@ -17,16 +17,18 @@ if file is not None:
 
     # Input fields for Agent name and date range
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
-    start_date = st.date_input('Start Date', min_value=my_data['Date'].min())
-    end_date = st.date_input('End Date', min_value=start_date)
+
+    # Calendar for date selection
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input('Start Date', min_value=my_data['Date'].min(), max_value=my_data['Date'].max())
+    with col2:
+        end_date = st.date_input('End Date', min_value=start_date, max_value=my_data['Date'].max())
 
     # Filter the data based on inputs
     filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
-                            (my_data['Date'] >= start_date)]
-
-    # Apply end_date filter if selected
-    if end_date:
-        filtered_data = filtered_data[filtered_data['Date'] <= end_date]
+                            (my_data['Date'] >= start_date) & 
+                            (my_data['Date'] <= end_date)]
 
     # Calculate 'Performance' column
     filtered_data['Target Achieved'] = filtered_data['Processed Lots'] >= filtered_data['Target Lots']
