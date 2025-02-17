@@ -16,7 +16,7 @@ if file is not None:
     my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y',errors='coerce').dt.date
 
     # Input fields for Agent name
-    agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
+    agent_name = st.selectbox('Select Agent Name', my_data['Agent Name'].unique())
 
     # Calendar for date range selection
     st.subheader("Select Date Range for Productivity Analysis")
