@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 
 # Streamlit app layout
-st.title('Agent Performance Tracker')
+st.title('Agent Productivity Tracker')
 
 # File upload widget
 file = st.file_uploader("Upload your CSV file", type="csv")
@@ -15,35 +15,35 @@ if file is not None:
     # Convert 'Date' column to datetime and keep only the date (no time)
     my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y').dt.date
 
-    # Input fields for Agent name and date range
+    # Input fields for Agent name and date selection
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
 
     # Calendar for date selection
-    col1, col2 = st.columns(2)
-    with col1:
-        start_date = st.date_input('Start Date', min_value=my_data['Date'].min(), max_value=my_data['Date'].max())
-    with col2:
-        end_date = st.date_input('End Date', min_value=start_date, max_value=my_data['Date'].max())
+    st.subheader("Select Dates for Productivity Analysis")
+    selected_dates = st.multiselect(
+        'Choose specific dates', 
+        options=my_data['Date'].unique(), 
+        default=my_data['Date'].unique()[:3]  # Default to first 3 dates
+    )
 
     # Filter the data based on inputs
     filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
-                            (my_data['Date'] >= start_date) & 
-                            (my_data['Date'] <= end_date)]
+                            (my_data['Date'].isin(selected_dates))]
 
     # Calculate 'Performance' column
     filtered_data['Target Achieved'] = filtered_data['Processed Lots'] >= filtered_data['Target Lots']
 
     # Display filtered data
     if filtered_data.empty:
-        st.write("No data available for the selected agent and date range.")
+        st.write("No data available for the selected agent and dates.")
     else:
         st.write(filtered_data[['Date', 'Queue', 'Processed Lots', 'Reasons', 'Target Achieved']])
 
-        # Check if target was achieved for the entire period
+        # Check if target was achieved for the selected dates
         if filtered_data['Target Achieved'].all():
-            st.success('Target Achieved!')
+            st.success('Target Achieved for all selected dates!')
         else:
-            st.warning('Target Not Achieved')
+            st.warning('Target Not Achieved for some dates')
 
         # 📊 Line Chart: Processed Lots Over Time (Enhanced Visualization)
         st.subheader("Processed Lots Over Time")
