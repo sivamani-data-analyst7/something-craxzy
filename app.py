@@ -15,35 +15,36 @@ if file is not None:
     # Convert 'Date' column to datetime and keep only the date (no time)
     my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y').dt.date
 
-    # Input fields for Agent name and date selection
+    # Input fields for Agent name
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
 
-    # Calendar for date selection
-    st.subheader("Select Dates for Productivity Analysis")
-    selected_dates = st.multiselect(
-        'Choose specific dates', 
-        options=my_data['Date'].unique(), 
-        default=my_data['Date'].unique()[:3]  # Default to first 3 dates
-    )
+    # Calendar for date range selection
+    st.subheader("Select Date Range for Productivity Analysis")
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input('From Date', min_value=my_data['Date'].min(), max_value=my_data['Date'].max())
+    with col2:
+        end_date = st.date_input('To Date', min_value=start_date, max_value=my_data['Date'].max())
 
     # Filter the data based on inputs
     filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
-                            (my_data['Date'].isin(selected_dates))]
+                            (my_data['Date'] >= start_date) & 
+                            (my_data['Date'] <= end_date)]
 
     # Calculate 'Performance' column
     filtered_data['Target Achieved'] = filtered_data['Processed Lots'] >= filtered_data['Target Lots']
 
     # Display filtered data
     if filtered_data.empty:
-        st.write("No data available for the selected agent and dates.")
+        st.write("No data available for the selected agent and date range.")
     else:
         st.write(filtered_data[['Date', 'Queue', 'Processed Lots', 'Reasons', 'Target Achieved']])
 
-        # Check if target was achieved for the selected dates
+        # Check if target was achieved for the selected date range
         if filtered_data['Target Achieved'].all():
-            st.success('Target Achieved for all selected dates!')
+            st.success('Target Achieved for the selected date range!')
         else:
-            st.warning('Target Not Achieved for some dates')
+            st.warning('Target Not Achieved for some dates in the range')
 
         # 📊 Line Chart: Processed Lots Over Time (Enhanced Visualization)
         st.subheader("Processed Lots Over Time")
