@@ -12,17 +12,8 @@ if file is not None:
     # Read the CSV file
     my_data = pd.read_csv(file, encoding='ISO-8859-1')
 
-    # Inspect the unique values in the 'Date' column (for debugging)
-    st.write(my_data['Date'].unique())
-
-    # Convert 'Date' column to datetime, handling errors and filling invalid dates with NaT
-    my_data['Date'] = pd.to_datetime(my_data['Date'], infer_datetime_format=True, errors='coerce')
-
-    # Optionally, fill NaT (invalid date entries) with a placeholder date if needed
-    my_data['Date'].fillna(pd.to_datetime('01/01/2025'), inplace=True)
-
-    # Convert the datetime object to just the date (no time)
-    my_data['Date'] = my_data['Date'].dt.date
+    # Convert 'Date' column to datetime and keep only the date (no time)
+    my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y').dt.date
 
     # Input fields for Agent name and date range
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
@@ -30,13 +21,12 @@ if file is not None:
     end_date = st.date_input('End Date', min_value=start_date)
 
     # Filter the data based on inputs
-    filtered_data = my_data[(my_data['Agent name'] == agent_name) & (my_data['Date'] >= start_date)]
+    filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
+                            (my_data['Date'] >= start_date)]
 
-    # Apply end_date filter only if it is selected
-    if start_date and end_date:
-        filtered_data = filtered_data[(filtered_data['Date'] >= start_date) & (filtered_data['Date'] <= end_date)]
-    elif start_date:
-        filtered_data = filtered_data[filtered_data['Date'] >= start_date]
+    # Apply end_date filter if selected
+    if end_date:
+        filtered_data = filtered_data[filtered_data['Date'] <= end_date]
 
     # Calculate 'Performance' column
     filtered_data['Target Achieved'] = filtered_data['Processed Lots'] >= filtered_data['Target Lots']
@@ -64,7 +54,7 @@ if file is not None:
         fig_line.update_yaxes(range=[y_min, y_max])  # Set custom y-axis range
         st.plotly_chart(fig_line)
 
-        # 📊 Bar Chart: Processed vs. Target Lots
+  # 📊 Bar Chart: Processed vs. Target Lots
         st.subheader("Processed vs. Target Lots")
         fig_bar = px.bar(filtered_data, x='Date', y=['Processed Lots', 'Target Lots'], 
                          title='Processed vs. Target Lots', barmode='group')
@@ -73,7 +63,7 @@ if file is not None:
 
         # 📊 Pie Chart: Target Achievement Distribution
         st.subheader("Target Achievement Distribution")
-        achievement_counts = filtered_data['Target Achieved'].fillna(False).value_counts().reset_index()
+        achievement_counts = filtered_data['Target Achieved'].value_counts().reset_index()
         achievement_counts.columns = ['Target Achieved', 'Count']
         fig_pie = px.pie(achievement_counts, names='Target Achieved', values='Count', 
                          title='Target Achievement Ratio', color='Target Achieved')
