@@ -13,7 +13,7 @@ if file is not None:
     my_data = pd.read_csv(file, encoding='ISO-8859-1')
 
     # Convert 'Date' column to datetime and keep only the date (no time)
-    my_data['Date'] = pd.to_datetime(my_data['Date'], format='%d/%m/%Y').dt.date
+    my_data['Date'] = pd.to_datetime(my_data['Date'], infer_datetime_format=True).dt.date
 
     # Input fields for Agent name and date range
     agent_name = st.selectbox('Select Agent Name', my_data['Agent name'].unique())
@@ -21,12 +21,13 @@ if file is not None:
     end_date = st.date_input('End Date', min_value=start_date)
 
     # Filter the data based on inputs
-    filtered_data = my_data[(my_data['Agent name'] == agent_name) & 
-                            (my_data['Date'] >= start_date)]
+    filtered_data = my_data[(my_data['Agent name'] == agent_name) & (my_data['Date'] >= start_date)]
 
-    # Apply end_date filter if selected
-    if end_date:
-        filtered_data = filtered_data[filtered_data['Date'] <= end_date]
+    # Apply end_date filter only if it is selected
+    if start_date and end_date:
+        filtered_data = filtered_data[(filtered_data['Date'] >= start_date) & (filtered_data['Date'] <= end_date)]
+    elif start_date:
+        filtered_data = filtered_data[filtered_data['Date'] >= start_date]
 
     # Calculate 'Performance' column
     filtered_data['Target Achieved'] = filtered_data['Processed Lots'] >= filtered_data['Target Lots']
@@ -54,7 +55,7 @@ if file is not None:
         fig_line.update_yaxes(range=[y_min, y_max])  # Set custom y-axis range
         st.plotly_chart(fig_line)
 
-  # 📊 Bar Chart: Processed vs. Target Lots
+        # 📊 Bar Chart: Processed vs. Target Lots
         st.subheader("Processed vs. Target Lots")
         fig_bar = px.bar(filtered_data, x='Date', y=['Processed Lots', 'Target Lots'], 
                          title='Processed vs. Target Lots', barmode='group')
@@ -63,7 +64,7 @@ if file is not None:
 
         # 📊 Pie Chart: Target Achievement Distribution
         st.subheader("Target Achievement Distribution")
-        achievement_counts = filtered_data['Target Achieved'].value_counts().reset_index()
+        achievement_counts = filtered_data['Target Achieved'].fillna(False).value_counts().reset_index()
         achievement_counts.columns = ['Target Achieved', 'Count']
         fig_pie = px.pie(achievement_counts, names='Target Achieved', values='Count', 
                          title='Target Achievement Ratio', color='Target Achieved')
