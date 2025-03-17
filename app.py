@@ -72,3 +72,14 @@ if file is not None:
         fig_pie = px.pie(achievement_counts, names='Target Achieved', values='Count', 
                          title='Target Achievement Ratio', color='Target Achieved')
         st.plotly_chart(fig_pie)
+           # Add a download button for the filtered data
+        csv = filtered_data.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download Filtered Data as CSV",
+            data=csv,
+            file_name='filtered_data.csv',
+            mime='text/csv',
+        )
+
+
+
