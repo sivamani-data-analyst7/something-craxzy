@@ -73,6 +73,7 @@ if file is not None:
                          title='Target Achievement Ratio', color='Target Achieved')
         st.plotly_chart(fig_pie)
            # Add a download button for the filtered data
+      # Add a download button for the filtered data
         csv = filtered_data.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="Download Filtered Data as CSV",
@@ -80,5 +81,4 @@ if file is not None:
             file_name='filtered_data.csv',
             mime='text/csv',
         )
-
 
