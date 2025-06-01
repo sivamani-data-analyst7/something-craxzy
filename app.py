@@ -29,14 +29,13 @@ if uploaded_file:
 
     agent_name = st.selectbox("Select an Agent", sorted(agents))
 
-    # Date range filter
-    min_date = df['Date'].min()
-    max_date = df['Date'].max()
-
-    start_date, end_date = st.date_input("Select Date Range", [min_date, max_date], min_value=min_date, max_value=max_date)
-    if start_date > end_date:
-        st.error("Start date cannot be after end date.")
-        st.stop()
+    # Calendar for date range selection
+    st.subheader("Select Date Range for Productivity Analysis")
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input('From Date', min_value=my_data['Date'].min(), max_value=my_data['Date'].max())
+    with col2:
+        end_date = st.date_input('To Date', min_value=start_date, max_value=my_data['Date'].max())
 
     # Filter data
     filtered_data = df[
